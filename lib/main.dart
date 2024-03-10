@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/Screens/homepage.dart';
 import 'package:unify/firebase_options.dart';
-import 'package:unify/provider/comment_provider.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 
@@ -20,9 +19,6 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (context) => PostProvider(),
-      ),
-      ChangeNotifierProvider(
-        create: (context) => CommentProvider(),
       ),
     ],
     child: const MyApp(),

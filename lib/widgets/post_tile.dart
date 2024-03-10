@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/comment_provider.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 import 'package:unify/widgets/comment_bottom_sheet_widget.dart';
@@ -12,18 +11,17 @@ class PostTile extends StatelessWidget {
       required this.heading,
       required this.content,
       required this.date,
-      required this.index});
+      required this.postIndex});
   final String imgPath;
   final String heading;
   final String content;
   final DateTime date;
-  final int index;
+  final int postIndex;
 
   @override
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final commentProvider = Provider.of<CommentProvider>(context);
     return Column(
       children: [
         Container(
@@ -78,48 +76,53 @@ class PostTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SocialButton(
-                    icondata: postProvider.posts[index]["isLiked"]
-                        ? const Icon(
-                            Icons.favorite_rounded,
-                            color: Colors.red,
+                    icondata: postProvider.posts[postIndex]["isLiked"]
+                        ? Icon(
+                            Icons.thumb_up_alt,
+                            color: Theme.of(context).primaryColor,
                           )
-                        : const Icon(Icons.favorite_border_rounded),
-                    count: postProvider.posts[index]["likeCount"],
+                        : const Icon(Icons.thumb_up_alt_outlined),
+                    count: postProvider.posts[postIndex]["likeCount"],
                     onTap: () {
-                      postProvider.likePost(index);
+                      if (postProvider.posts[postIndex]["isDisliked"]) {
+                        postProvider.dislikePost(postIndex);
+                        postProvider.likePost(postIndex);
+                      } else {
+                        postProvider.likePost(postIndex);
+                      }
+                    },
+                  ),
+                  SocialButton(
+                    icondata: postProvider.posts[postIndex]["isDisliked"]
+                        ? Icon(
+                            Icons.thumb_down,
+                            color: Theme.of(context).primaryColor,
+                          )
+                        : const Icon(Icons.thumb_down_off_alt),
+                    count: postProvider.posts[postIndex]["dislikeCount"],
+                    onTap: () {
+                      if (postProvider.posts[postIndex]["isLiked"]) {
+                        postProvider.likePost(postIndex);
+                        postProvider.dislikePost(postIndex);
+                      } else {
+                        postProvider.dislikePost(postIndex);
+                      }
                     },
                   ),
                   SocialButton(
                     icondata: const Icon(Icons.comment_outlined),
-                    count: commentProvider.comments.length,
+                    count: postProvider.posts[postIndex]["comments"].length,
                     onTap: () {
                       showModalBottomSheet(
                           enableDrag: true,
                           isScrollControlled: true,
                           context: context,
-                          builder: (context) => Container(
+                          builder: (context) => SizedBox(
                                 height: 600,
-                                child: const CommentSheet(),
+                                child: CommentSheet(
+                                  postIndex: postIndex,
+                                ),
                               ));
-                    },
-                  ),
-                  SocialButton(
-                    icondata: postProvider.posts[index]["isSaved"]
-                        ? const Icon(Icons.bookmark)
-                        : const Icon(
-                            Icons.bookmark_border,
-                          ),
-                    count: postProvider.posts[index]["saveCount"],
-                    onTap: () {
-                      final post = {
-                        "profilePic": imgPath,
-                        "date": DateTime.now(),
-                        "heading": heading,
-                        "content": content,
-                      };
-                      postProvider.savePost(index);
-                      postProvider.addsavePosts(post, index);
-                      print(postProvider.savedPosts);
                     },
                   ),
                   const SizedBox(

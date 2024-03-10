@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:unify/Screens/add_post_screen.dart';
 import 'package:unify/Screens/contact_developer_screen.dart';
 import 'package:unify/Screens/post_screen.dart';
-import 'package:unify/Screens/saved_posts.dart';
 import 'package:unify/provider/theme_provider.dart';
 
 class Homepage extends StatefulWidget {
@@ -14,10 +13,10 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  static const List<Widget> pages = [
-    PostScreen(),
+  static List<Widget> pages = [
+    const PostScreen(),
     AddPostScreen(),
-    ContactDevScreen(),
+    const ContactDevScreen(),
   ];
   static const List<String> pagetitle = [
     "Posts",
@@ -52,18 +51,7 @@ class _HomepageState extends State<Homepage> {
                   Navigator.of(context).pop();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.bookmark_added_rounded),
-                title: const Text("Saved Posts"),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SavedPosts(),
-                    ),
-                  );
-                },
-              ),
+
             ],
           ),
         ),

@@ -4,14 +4,9 @@ import 'package:unify/Screens/homepage.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 
-class AddPostScreen extends StatefulWidget {
-  const AddPostScreen({super.key});
+class AddPostScreen extends StatelessWidget {
+  AddPostScreen({super.key});
 
-  @override
-  State<AddPostScreen> createState() => _AddPostScreenState();
-}
-
-class _AddPostScreenState extends State<AddPostScreen> {
   final postController = TextEditingController();
   final titleController = TextEditingController();
 
@@ -28,26 +23,27 @@ class _AddPostScreenState extends State<AddPostScreen> {
             maxLength: 35,
             controller: titleController,
             decoration: InputDecoration(
-                hintText: "Title",
-                hintStyle: context.watch<ThemeProvider>().isDarkMode
-                    ? Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: Colors.white54)
-                    : Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: Colors.black54),
-                contentPadding: const EdgeInsets.all(16),
-                enabledBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor)),
-                border: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor)),
-                focusedBorder: OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Theme.of(context).primaryColor))),
+              hintText: "Title",
+              hintStyle: context.watch<ThemeProvider>().isDarkMode
+                  ? Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54)
+                  : Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.black54),
+              contentPadding: const EdgeInsets.all(16),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
+            ),
           ),
           const SizedBox(
             height: 10,
@@ -99,11 +95,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 "heading": titleController.text,
                 "content": postController.text,
                 "isLiked": false,
-                "isSaved": false,
-                "saveCount": 0,
+                "isDisliked": false,
+                "dislikeCount": 0,
                 "likeCount": 0,
+                "comments": []
               };
               Provider.of<PostProvider>(context, listen: false).addPost(post);
+              postController.clear();
+              titleController.clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   backgroundColor: Theme.of(context).primaryColorDark,

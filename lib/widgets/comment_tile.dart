@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/comment_provider.dart';
+import 'package:unify/provider/post_provider.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile(
@@ -8,18 +8,19 @@ class CommentTile extends StatelessWidget {
       required this.comment,
       required this.date,
       required this.isLiked,
-      required this.index});
+      required this.commentIndex, required this.postIndex});
   final String comment;
   final DateTime date;
   final bool isLiked;
-  final int index;
+  final int commentIndex;
+  final int postIndex;
 
   @override
   Widget build(BuildContext context) {
-    final commentProvider = Provider.of<CommentProvider>(context);
+    final postProvider = Provider.of<PostProvider>(context);
     return ListTile(
       onTap: () {
-        commentProvider.likeUnlikeComment(index);
+       postProvider.likeComment(postIndex, commentIndex);
       },
       titleAlignment: ListTileTitleAlignment.center,
       leading: const CircleAvatar(
@@ -27,7 +28,7 @@ class CommentTile extends StatelessWidget {
       ),
       title: Text(comment),
       subtitle: Text(date.toString()),
-      trailing: commentProvider.comments[index]["isLiked"]
+      trailing: postProvider.posts[postIndex]["comments"][commentIndex]["isCommentLiked"]
           ? const Icon(
               Icons.favorite_rounded,
               size: 15,

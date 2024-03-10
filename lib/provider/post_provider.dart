@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PostProvider extends ChangeNotifier {
-  final Map<int, Map<String,dynamic>> savedPosts = {};
+  final Map<int, Map<String, dynamic>> savedPosts = {};
 
   final List<Map<String, dynamic>> posts = [
     {
@@ -11,9 +11,11 @@ class PostProvider extends ChangeNotifier {
       "content":
           "i college students and no one else. In this app you can post text based posts anonymously about any topic you like.There will be a screen where all posts will be displayed, a screen where polls will be displayed, a contact developer screen and a make post/poll screen.",
       "isSaved": false,
-      "saveCount": 0,
+      "dislikeCount": 0,
       "likeCount": 0,
-      "isLiked": false
+      "isLiked": false,
+      "isDisliked": false,
+      "comments": []
     },
   ];
 
@@ -22,8 +24,25 @@ class PostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deletePost(Map<String, dynamic> post) {
-    posts.remove(post);
+  void deletePost(Map<String, dynamic> post, int postIndex) {
+    posts.removeAt(postIndex);
+    notifyListeners();
+  }
+
+  void addComment(Map<String, dynamic> comment, int postIndex) {
+    posts[postIndex]["comments"].add(comment);
+    notifyListeners();
+  }
+
+  void deleteComment(
+      Map<String, dynamic> comment, int postIndex, int commmentIndex) {
+    posts[postIndex]["comments"].removeAt(commmentIndex);
+    notifyListeners();
+  }
+
+  void likeComment(int postIndex, int commentIndex) {
+    posts[postIndex]["comments"][commentIndex]["isCommentLiked"] =
+        !posts[postIndex]["comments"][commentIndex]["isCommentLiked"];
     notifyListeners();
   }
 
@@ -38,22 +57,14 @@ class PostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void savePost(int index) {
-    posts[index]["isSaved"] = !posts[index]["isSaved"];
-    if (posts[index]["isSaved"]) {
-      posts[index]["saveCount"]++;
+  void dislikePost(int index) {
+    posts[index]["isDisliked"] = !posts[index]["isDisliked"];
+    if (posts[index]["isDisliked"]) {
+      posts[index]["dislikeCount"]++;
     } else {
-      posts[index]["saveCount"]--;
+      posts[index]["dislikeCount"]--;
     }
-    notifyListeners();
-  }
 
-  void addsavePosts(Map<String, dynamic> post, int index) {
-    if (posts[index]["isSaved"]) {
-      savedPosts[index] = post;
-    } else {
-      savedPosts.remove(index);
-    }
     notifyListeners();
   }
 }

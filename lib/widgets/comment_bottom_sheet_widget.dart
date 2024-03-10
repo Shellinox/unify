@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/comment_provider.dart';
+import 'package:unify/provider/post_provider.dart';
 import 'package:unify/widgets/comment_tile.dart';
 
 class CommentSheet extends StatelessWidget {
-  const CommentSheet({super.key});
+  const CommentSheet(
+      {super.key, required this.postIndex});
+  final int postIndex;
+
 
   @override
   Widget build(BuildContext context) {
-    final commentProvider = Provider.of<CommentProvider>(context);
+    final postProvider = Provider.of<PostProvider>(context);
     final commentController = TextEditingController();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -21,20 +24,25 @@ class CommentSheet extends StatelessWidget {
             "Comments",
           ),
           Expanded(
-            child: commentProvider.comments.isEmpty
+            child: postProvider.posts[postIndex]["comments"].isEmpty
                 ? const Center(
                     child: Text("No comments"),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: ListView.builder(
-                      itemCount: commentProvider.comments.length,
-                      itemBuilder: (context, idx) {
+                      itemCount:
+                          postProvider.posts[postIndex]["comments"].length,
+                      itemBuilder: (context, commentIndex) {
                         return CommentTile(
-                          comment: commentProvider.comments[idx]['comment'],
-                          date: commentProvider.comments[idx]['time'],
-                          isLiked: commentProvider.comments[idx]["isLiked"],
-                          index: idx,
+                          comment: postProvider.posts[postIndex]["comments"]
+                              [commentIndex]["comment"],
+                          date: postProvider.posts[postIndex]["comments"]
+                              [commentIndex]["date"],
+                          isLiked: postProvider.posts[postIndex]["comments"]
+                              [commentIndex]["isCommentLiked"],
+                          commentIndex: commentIndex,
+                          postIndex: postIndex,
                         );
                       },
                     ),
@@ -52,11 +60,12 @@ class CommentSheet extends StatelessWidget {
                   hintStyle: Theme.of(context).textTheme.titleSmall,
                   suffix: IconButton(
                     onPressed: () {
-                      commentProvider.addComment({
-                        "comment": commentController.text,
-                        "time": DateTime.now(),
-                        "isLiked": false
-                      });
+                      final comment = {
+                        "comment":commentController.text,
+                        "date":DateTime.now(),
+                        "isCommentLiked":false
+                      };
+                      postProvider.addComment(comment, postIndex);
                       commentController.clear();
                     },
                     icon: const Icon(Icons.send),
