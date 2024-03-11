@@ -1,26 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PostProvider extends ChangeNotifier {
   final Map<int, Map<String, dynamic>> savedPosts = {};
 
-  final List<Map<String, dynamic>> posts = [
-    {
-      "profilePic": "lib/assets/images/profile.jpg",
-      "date": DateTime.now(),
-      "heading": "This is the heading of the post",
-      "content":
-          "i college students and no one else. In this app you can post text based posts anonymously about any topic you like.There will be a screen where all posts will be displayed, a screen where polls will be displayed, a contact developer screen and a make post/poll screen.",
-      "isSaved": false,
-      "dislikeCount": 0,
-      "likeCount": 0,
-      "isLiked": false,
-      "isDisliked": false,
-      "comments": []
-    },
-  ];
+  final List<Map<String, dynamic>> posts = [];
 
-  void addPost(Map<String, dynamic> post) {
-    posts.add(post);
+  void addPost(Map<String, dynamic> post) async {
+    await FirebaseFirestore.instance
+                      .collection("Posts")
+                      .add(post);
     notifyListeners();
   }
 

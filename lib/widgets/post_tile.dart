@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_time_format/date_time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/provider/post_provider.dart';
@@ -26,8 +28,8 @@ class PostTile extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3)),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,9 +47,11 @@ class PostTile extends StatelessWidget {
                       Text(
                         heading,
                         style: Theme.of(context).textTheme.titleMedium,
+                        textAlign: TextAlign.left,
                       ),
                       Text(
-                        date.toString(),
+                        DateTimeFormat.format(date,
+                            format: DateTimeFormats.american),
                         style: themeProvider.isDarkMode
                             ? Theme.of(context)
                                 .textTheme

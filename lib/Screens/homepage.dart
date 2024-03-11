@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:unify/Screens/add_post_screen.dart';
 import 'package:unify/Screens/contact_developer_screen.dart';
 import 'package:unify/Screens/post_screen.dart';
-import 'package:unify/provider/theme_provider.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -18,11 +16,6 @@ class _HomepageState extends State<Homepage> {
     AddPostScreen(),
     const ContactDevScreen(),
   ];
-  static const List<String> pagetitle = [
-    "Posts",
-    "Add Post",
-    "Contact us",
-  ];
   int selectedIndex = 0;
 
   void onTapped(int index) {
@@ -34,28 +27,6 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 100,
-              ),
-              ListTile(
-                leading: const Icon(Icons.dark_mode_outlined),
-                title: const Text("Change Theme"),
-                onTap: () {
-                  Provider.of<ThemeProvider>(context, listen: false)
-                      .toggleTheme();
-                  Navigator.of(context).pop();
-                },
-              ),
-
-            ],
-          ),
-        ),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedFontSize: 0,
         unselectedFontSize: 0,
@@ -70,11 +41,6 @@ class _HomepageState extends State<Homepage> {
         ],
         onTap: onTapped,
         currentIndex: selectedIndex,
-      ),
-      appBar: AppBar(
-        title: Text(pagetitle[selectedIndex]),
-        forceMaterialTransparency: true,
-        centerTitle: true,
       ),
       body: IndexedStack(
         index: selectedIndex,

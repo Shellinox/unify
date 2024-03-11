@@ -53,6 +53,7 @@ class CommentSheet extends StatelessWidget {
             child: SingleChildScrollView(
               padding: MediaQuery.of(context).viewInsets,
               child: TextField(
+                autofocus: true,
                 controller: commentController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -61,7 +62,7 @@ class CommentSheet extends StatelessWidget {
                   suffix: IconButton(
                     onPressed: () {
                       final comment = {
-                        "comment":commentController.text,
+                        "comment":commentController.text.toString().trim(),
                         "date":DateTime.now(),
                         "isCommentLiked":false
                       };
