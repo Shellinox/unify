@@ -3,9 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/Screens/homepage.dart';
-import 'package:unify/Screens/login_screen.dart';
-import 'package:unify/firebase_options.dart';
+import 'package:unify/auth/auth.dart';
+import 'package:unify/services/firebase_options.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 import 'package:unify/services/firebase_sign_in.dart';
@@ -26,9 +25,6 @@ void main() async {
       Provider<FirebaseAuthMethod>(
         create: (_) => FirebaseAuthMethod(FirebaseAuth.instance),
       ),
-      StreamProvider(
-          create: (context) => context.read<FirebaseAuthMethod>().authState,
-          initialData: null)
     ],
     child: const MyApp(),
   ));
@@ -59,21 +55,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           useMaterial3: true),
-      home: const AuthWrapper(),
+      home: const AuthPage(),
     );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final firebaseUser = context.watch<User?>();
-    if (firebaseUser != null) {
-      return const Homepage();
-    } 
-      return const LoginScreen();
-    
   }
 }

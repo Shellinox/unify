@@ -1,17 +1,27 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:unify/provider/post_provider.dart';
+import 'package:unify/services/date_formatter.dart';
 import 'package:unify/widgets/comment_tile.dart';
 
 class CommentSheet extends StatelessWidget {
-  const CommentSheet(
-      {super.key, required this.postIndex});
-  final int postIndex;
-
+  CommentSheet({super.key, required this.postID});
+  final String postID;
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  void addComment(String comment) {
+    FirebaseFirestore.instance
+        .collection("Posts")
+        .doc(postID)
+        .collection("Comments")
+        .add({
+      "Comment": comment,
+      "Comment by": currentUser.email,
+      "time": Timestamp.now()
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context);
     final commentController = TextEditingController();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -24,29 +34,34 @@ class CommentSheet extends StatelessWidget {
             "Comments",
           ),
           Expanded(
-            child: postProvider.posts[postIndex]["comments"].isEmpty
-                ? const Center(
-                    child: Text("No comments"),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: ListView.builder(
-                      itemCount:
-                          postProvider.posts[postIndex]["comments"].length,
-                      itemBuilder: (context, commentIndex) {
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("Posts")
+                      .doc(postID)
+                      .collection("Comments")
+                      .orderBy("time", descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    return ListView(
+                      shrinkWrap: true,
+                      children: snapshot.data!.docs.map((doc) {
+                        final commentData = doc.data();
                         return CommentTile(
-                          comment: postProvider.posts[postIndex]["comments"]
-                              [commentIndex]["comment"],
-                          date: postProvider.posts[postIndex]["comments"]
-                              [commentIndex]["date"],
-                          isLiked: postProvider.posts[postIndex]["comments"]
-                              [commentIndex]["isCommentLiked"],
-                          commentIndex: commentIndex,
-                          postIndex: postIndex,
+                          comment: commentData["Comment"],
+                          date: formatDate(commentData["time"]),
+                          commentBy: commentData["Comment by"],
                         );
-                      },
-                    ),
-                  ),
+                      }).toList(),
+                    );
+                  }),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -61,13 +76,10 @@ class CommentSheet extends StatelessWidget {
                   hintStyle: Theme.of(context).textTheme.titleSmall,
                   suffix: IconButton(
                     onPressed: () {
-                      final comment = {
-                        "comment":commentController.text.toString().trim(),
-                        "date":DateTime.now(),
-                        "isCommentLiked":false
-                      };
-                      postProvider.addComment(comment, postIndex);
-                      commentController.clear();
+                      if (commentController.text.toString().isNotEmpty) {
+                        addComment(commentController.text.toString());
+                        commentController.clear();
+                      }
                     },
                     icon: const Icon(Icons.send),
                   ),

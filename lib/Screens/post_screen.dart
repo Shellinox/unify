@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
+import 'package:unify/services/date_formatter.dart';
+import 'package:unify/services/firebase_sign_in.dart';
 import 'package:unify/widgets/post_tile.dart';
 
 class PostScreen extends StatelessWidget {
@@ -9,7 +13,6 @@ class PostScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final postList = Provider.of<PostProvider>(context).posts;
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
@@ -28,26 +31,48 @@ class PostScreen extends StatelessWidget {
                     Icons.light_mode,
                     size: 20,
                   ),
-          )
+          ),
+          IconButton(
+              onPressed: () {
+                FirebaseAuthMethod(FirebaseAuth.instance).logout(context);
+              },
+              icon: const Icon(Icons.logout)),
         ],
       ),
-      body: postList.isEmpty
-          ? const Center(
-              child: Text("no posts"),
-            )
-          : ListView.builder(
-              itemCount: postList.length,
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection("Posts")
+            .orderBy("date", descending: true)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
               itemBuilder: ((context, postIndex) {
-                final post = postList[postIndex];
-                return PostTile(
-                  imgPath: post['profilePic'],
-                  heading: post['heading'],
-                  content: post['content'],
-                  date: post['date'],
-                  postIndex: postIndex,
-                );
+                final post = snapshot.data!.docs[postIndex];
+                return snapshot.data!.docs.isEmpty
+                    ? const Text("No posts yet")
+                    : PostTile(
+                        imgPath: post['profilePic'],
+                        heading: post['heading'],
+                        content: post['content'],
+                        date: formatDate(post["date"]),
+                        postID: post.id,
+                        likes: List<String>.from(post["likes"] ?? []),
+                        disLikes: List<String>.from(post["disLikes"] ?? []),
+                        user:
+                            FirebaseAuth.instance.currentUser!.email.toString(),
+                      );
               }),
-            ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text("Error : ${snapshot.error.toString()}"),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
     );
   }
 }

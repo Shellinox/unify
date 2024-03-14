@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:unify/Screens/homepage.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
+import 'package:unify/services/date_formatter.dart';
 
 class AddPostScreen extends StatelessWidget {
   AddPostScreen({super.key});
@@ -121,15 +122,12 @@ class AddPostScreen extends StatelessWidget {
                 } else {
                   final post = {
                     "profilePic": "lib/assets/images/profile.jpg",
-                    "date": DateTime.now(),
+                    "date": Timestamp.now(),
                     "heading": titleController.text.toString().trim(),
                     "content": postController.text.toString().trim(),
-                    "isLiked": false,
-                    "isDisliked": false,
-                    "dislikeCount": 0,
-                    "likeCount": 0,
+                    "disLikes": [],
+                    "likes": [],
                     "comments": [],
-                    "UserID": context.read<User?>()?.uid.toString()
                   };
                   Provider.of<PostProvider>(context, listen: false)
                       .addPost(post);

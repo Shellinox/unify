@@ -1,28 +1,80 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:date_time_format/date_time_format.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 import 'package:unify/widgets/comment_bottom_sheet_widget.dart';
 
-class PostTile extends StatelessWidget {
+class PostTile extends StatefulWidget {
   const PostTile(
       {super.key,
       required this.imgPath,
       required this.heading,
       required this.content,
       required this.date,
-      required this.postIndex});
+      required this.postID,
+      required this.likes,
+      required this.disLikes, required this.user});
   final String imgPath;
   final String heading;
   final String content;
-  final DateTime date;
-  final int postIndex;
+  final String date;
+  final String postID;
+  final List<String> likes;
+  final List<String> disLikes;
+  final String user;
+
+  @override
+  State<PostTile> createState() => _PostTileState();
+}
+
+class _PostTileState extends State<PostTile> {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  bool isLiked = false;
+  bool isDisliked = false;
+  @override
+  void initState() {
+    isLiked = widget.likes.contains(currentUser.uid);
+    isDisliked = widget.likes.contains(currentUser.uid);
+    super.initState();
+  }
+
+  void toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+    DocumentReference postref =
+        FirebaseFirestore.instance.collection("Posts").doc(widget.postID);
+    if (isLiked) {
+      postref.update({
+        "likes": FieldValue.arrayUnion([currentUser.uid])
+      });
+    } else {
+      postref.update({
+        "likes": FieldValue.arrayRemove([currentUser.uid])
+      });
+    }
+  }
+
+  void toggledislike() {
+    setState(() {
+      isDisliked = !isDisliked;
+    });
+    DocumentReference postref =
+        FirebaseFirestore.instance.collection("Posts").doc(widget.postID);
+    if (isDisliked) {
+      postref.update({
+        "disLikes": FieldValue.arrayUnion([currentUser.uid])
+      });
+    } else {
+      postref.update({
+        "disLikes": FieldValue.arrayRemove([currentUser.uid])
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Column(
       children: [
@@ -36,7 +88,7 @@ class PostTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    backgroundImage: AssetImage(imgPath),
+                    backgroundImage: AssetImage(widget.imgPath),
                   ),
                   const SizedBox(
                     width: 10,
@@ -45,13 +97,12 @@ class PostTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        heading,
+                        widget.heading,
                         style: Theme.of(context).textTheme.titleMedium,
                         textAlign: TextAlign.left,
                       ),
                       Text(
-                        DateTimeFormat.format(date,
-                            format: DateTimeFormats.american),
+                        widget.date,
                         style: themeProvider.isDarkMode
                             ? Theme.of(context)
                                 .textTheme
@@ -70,7 +121,7 @@ class PostTile extends StatelessWidget {
                 height: 10,
               ),
               Text(
-                content,
+                widget.content,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(
@@ -80,53 +131,40 @@ class PostTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SocialButton(
-                    icondata: postProvider.posts[postIndex]["isLiked"]
+                    icondata: isLiked
                         ? Icon(
                             Icons.thumb_up_alt,
                             color: Theme.of(context).primaryColor,
                           )
                         : const Icon(Icons.thumb_up_alt_outlined),
-                    count: postProvider.posts[postIndex]["likeCount"],
-                    onTap: () {
-                      if (postProvider.posts[postIndex]["isDisliked"]) {
-                        postProvider.dislikePost(postIndex);
-                        postProvider.likePost(postIndex);
-                      } else {
-                        postProvider.likePost(postIndex);
-                      }
-                    },
+                    count: widget.likes.length,
+                    onTap: isDisliked ? () {} : toggleLike,
                   ),
                   SocialButton(
-                    icondata: postProvider.posts[postIndex]["isDisliked"]
+                    icondata: isDisliked
                         ? Icon(
                             Icons.thumb_down,
                             color: Theme.of(context).primaryColor,
                           )
                         : const Icon(Icons.thumb_down_off_alt),
-                    count: postProvider.posts[postIndex]["dislikeCount"],
-                    onTap: () {
-                      if (postProvider.posts[postIndex]["isLiked"]) {
-                        postProvider.likePost(postIndex);
-                        postProvider.dislikePost(postIndex);
-                      } else {
-                        postProvider.dislikePost(postIndex);
-                      }
-                    },
+                    count: widget.disLikes.length,
+                    onTap: isLiked ? () {} : toggledislike,
                   ),
                   SocialButton(
                     icondata: const Icon(Icons.comment_outlined),
-                    count: postProvider.posts[postIndex]["comments"].length,
+                    count: 0,
                     onTap: () {
                       showModalBottomSheet(
-                          enableDrag: true,
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) => SizedBox(
-                                height: 600,
-                                child: CommentSheet(
-                                  postIndex: postIndex,
-                                ),
-                              ));
+                        enableDrag: true,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => SizedBox(
+                          height: 600,
+                          child: CommentSheet(
+                            postID: widget.postID,
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(
