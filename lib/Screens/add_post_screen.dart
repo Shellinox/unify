@@ -5,6 +5,7 @@ import 'package:unify/Screens/homepage.dart';
 import 'package:unify/auth/auth.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
+import 'package:unify/widgets/snackbar.dart';
 
 class AddPostScreen extends StatelessWidget {
   AddPostScreen({super.key});
@@ -132,15 +133,7 @@ class AddPostScreen extends StatelessWidget {
                       .addPost(post);
                   postController.clear();
                   titleController.clear();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Theme.of(context).primaryColorDark,
-                      content: const Text(
-                        "Post shared successfully",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  );
+                  showSnackbar(context, "Post shared successfully");
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) => const AuthPage(),

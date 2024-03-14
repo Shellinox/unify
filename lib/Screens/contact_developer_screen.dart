@@ -1,13 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/provider/theme_provider.dart';
+import 'package:unify/widgets/snackbar.dart';
 
 class ContactDevScreen extends StatelessWidget {
   const ContactDevScreen({super.key});
 
+  sendSuggestion(String messege) {
+    FirebaseFirestore.instance.collection("User Sugggestions").doc().set(
+      {
+        "Messege": messege,
+        "From": FirebaseAuth.instance.currentUser!.email,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final textController = TextEditingController();
+    final suggestionController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -68,7 +80,7 @@ class ContactDevScreen extends StatelessWidget {
                 height: 20,
               ),
               TextField(
-                controller: textController,
+                controller: suggestionController,
                 decoration: InputDecoration(
                     hintText: "Have a suggestion? Tell us..",
                     hintStyle: context.watch<ThemeProvider>().isDarkMode
@@ -95,7 +107,13 @@ class ContactDevScreen extends StatelessWidget {
                 height: 10,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  sendSuggestion(
+                    suggestionController.text.toString(),
+                  );
+                  showSnackbar(context, "We will look into your suggestion");
+                  suggestionController.clear();
+                },
                 child: Container(
                   width: double.infinity,
                   height: 50,

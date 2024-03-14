@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:unify/widgets/alert_Dialog.dart';
+import 'package:unify/widgets/snackbar.dart';
 
 class FirebaseAuthMethod {
   final FirebaseAuth _auth;
@@ -18,19 +20,12 @@ class FirebaseAuthMethod {
           email: email, password: password);
       if (context.mounted) Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Account created successfully"),
-        ),
-      );
+      showSnackbar(context, "Account created successfully");
     } on FirebaseException catch (error) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message.toString(),
-          ),
-        ),
+      showSnackbar(
+        context,
+        error.message.toString(),
       );
     }
   }
@@ -46,15 +41,25 @@ class FirebaseAuthMethod {
       if (context.mounted) Navigator.pop(context);
     } on FirebaseException catch (error) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            error.message.toString(),
-          ),
-        ),
+      showSnackbar(
+        context,
+        error.message.toString(),
       );
     }
   }
 
-
+  void logout(BuildContext context) {
+    {
+      showAlert(
+        context,
+        "Are you sure you want to logout?",
+        "Logout?",
+        "Logout",
+        () {
+          FirebaseAuth.instance.signOut();
+          Navigator.of(context).pop();
+        },
+      );
+    }
+  }
 }

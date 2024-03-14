@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/provider/theme_provider.dart';
+import 'package:unify/widgets/alert_Dialog.dart';
 import 'package:unify/widgets/comment_bottom_sheet_widget.dart';
+import 'package:unify/widgets/snackbar.dart';
 
 class PostTile extends StatefulWidget {
   const PostTile(
@@ -14,7 +16,8 @@ class PostTile extends StatefulWidget {
       required this.date,
       required this.postID,
       required this.likes,
-      required this.disLikes, required this.user});
+      required this.disLikes,
+      required this.user});
   final String imgPath;
   final String heading;
   final String content;
@@ -84,7 +87,7 @@ class _PostTileState extends State<PostTile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CircleAvatar(
@@ -114,7 +117,24 @@ class _PostTileState extends State<PostTile> {
                                 ?.copyWith(color: Colors.black54),
                       ),
                     ],
-                  )
+                  ),
+                  const Spacer(),
+                  IconButton(
+                      onPressed: () {
+                        showAlert(
+                            context,
+                            "Are you sure you want to delete the post",
+                            "Delete post?",
+                            "Delete", () {
+                          FirebaseFirestore.instance
+                              .collection("Posts")
+                              .doc(widget.postID)
+                              .delete();
+                          showSnackbar(context, "Post deleted");
+                          Navigator.of(context).pop();
+                        });
+                      },
+                      icon: const Icon(Icons.delete))
                 ],
               ),
               const SizedBox(
