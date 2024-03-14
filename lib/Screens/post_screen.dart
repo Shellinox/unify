@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/provider/theme_provider.dart';
@@ -12,6 +11,12 @@ class PostScreen extends StatelessWidget {
   const PostScreen({super.key});
 
   @override
+
+    void logout() {
+    {
+      FirebaseAuth.instance.signOut();
+    }
+  }
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
@@ -33,9 +38,7 @@ class PostScreen extends StatelessWidget {
                   ),
           ),
           IconButton(
-              onPressed: () {
-                FirebaseAuthMethod(FirebaseAuth.instance).logout(context);
-              },
+              onPressed:logout,
               icon: const Icon(Icons.logout)),
         ],
       ),
@@ -50,19 +53,16 @@ class PostScreen extends StatelessWidget {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: ((context, postIndex) {
                 final post = snapshot.data!.docs[postIndex];
-                return snapshot.data!.docs.isEmpty
-                    ? const Text("No posts yet")
-                    : PostTile(
-                        imgPath: post['profilePic'],
-                        heading: post['heading'],
-                        content: post['content'],
-                        date: formatDate(post["date"]),
-                        postID: post.id,
-                        likes: List<String>.from(post["likes"] ?? []),
-                        disLikes: List<String>.from(post["disLikes"] ?? []),
-                        user:
-                            FirebaseAuth.instance.currentUser!.email.toString(),
-                      );
+                return PostTile(
+                  imgPath: post['profilePic'],
+                  heading: post['heading'],
+                  content: post['content'],
+                  date: formatDate(post["date"]),
+                  postID: post.id,
+                  likes: List<String>.from(post["likes"] ?? []),
+                  disLikes: List<String>.from(post["disLikes"] ?? []),
+                  user: FirebaseAuth.instance.currentUser!.email.toString(),
+                );
               }),
             );
           } else if (snapshot.hasError) {

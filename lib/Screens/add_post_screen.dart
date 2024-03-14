@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/Screens/homepage.dart';
+import 'package:unify/auth/auth.dart';
 import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
-import 'package:unify/services/date_formatter.dart';
 
 class AddPostScreen extends StatelessWidget {
   AddPostScreen({super.key});
@@ -98,7 +97,7 @@ class AddPostScreen extends StatelessWidget {
               width: 15,
             ),
             InkWell(
-              onTap: () async {
+              onTap: () {
                 if (postController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -144,7 +143,7 @@ class AddPostScreen extends StatelessWidget {
                   );
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => const Homepage(),
+                      builder: (context) => const AuthPage(),
                     ),
                   );
                 }

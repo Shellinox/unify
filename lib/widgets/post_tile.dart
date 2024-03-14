@@ -34,8 +34,8 @@ class _PostTileState extends State<PostTile> {
   bool isDisliked = false;
   @override
   void initState() {
-    isLiked = widget.likes.contains(currentUser.uid);
-    isDisliked = widget.likes.contains(currentUser.uid);
+    isLiked = widget.likes.contains(currentUser.email);
+    isDisliked = widget.disLikes.contains(currentUser.email);
     super.initState();
   }
 
@@ -47,11 +47,11 @@ class _PostTileState extends State<PostTile> {
         FirebaseFirestore.instance.collection("Posts").doc(widget.postID);
     if (isLiked) {
       postref.update({
-        "likes": FieldValue.arrayUnion([currentUser.uid])
+        "likes": FieldValue.arrayUnion([currentUser.email])
       });
     } else {
       postref.update({
-        "likes": FieldValue.arrayRemove([currentUser.uid])
+        "disLikes": FieldValue.arrayRemove([currentUser.email])
       });
     }
   }
@@ -64,11 +64,11 @@ class _PostTileState extends State<PostTile> {
         FirebaseFirestore.instance.collection("Posts").doc(widget.postID);
     if (isDisliked) {
       postref.update({
-        "disLikes": FieldValue.arrayUnion([currentUser.uid])
+        "disLikes": FieldValue.arrayUnion([currentUser.email])
       });
     } else {
       postref.update({
-        "disLikes": FieldValue.arrayRemove([currentUser.uid])
+        "disLikes": FieldValue.arrayRemove([currentUser.email])
       });
     }
   }
