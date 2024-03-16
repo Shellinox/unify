@@ -14,13 +14,4 @@ class PostProvider extends ChangeNotifier {
     posts.doc(postID).delete();
     notifyListeners();
   }
-
-  int getCount(String postID) {
-    FirebaseFirestore.instance
-        .collection("Posts")
-        .doc(postID)
-        .collection("Comments").snapshots().length;
-    notifyListeners();
-    return count;
-  }
 }

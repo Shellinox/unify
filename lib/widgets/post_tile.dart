@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 import 'package:unify/widgets/alert_Dialog.dart';
 import 'package:unify/widgets/comment_bottom_sheet_widget.dart';
@@ -18,7 +17,8 @@ class PostTile extends StatefulWidget {
       required this.postID,
       required this.likes,
       required this.disLikes,
-      required this.user, required this.commentsCount});
+      required this.user,
+      required this.commentsCount});
   final String imgPath;
   final String heading;
   final String content;
