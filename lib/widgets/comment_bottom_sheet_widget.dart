@@ -19,7 +19,7 @@ class CommentSheet extends StatelessWidget {
       "time": Timestamp.now(),
     });
     FirebaseFirestore.instance.collection("Posts").doc(postID).update({
-      "comments": FieldValue.arrayUnion([comment])
+      "comments": FieldValue.increment(1)
     });
   }
 

@@ -127,7 +127,7 @@ class AddPostScreen extends StatelessWidget {
                     "disLikes": [],
                     "likes": [],
                     "UserID": FirebaseAuth.instance.currentUser!.email,
-                    "comments":[]
+                    "comments":0
                   };
                   Provider.of<PostProvider>(context, listen: false)
                       .addPost(post);

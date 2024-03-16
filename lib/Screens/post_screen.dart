@@ -65,7 +65,7 @@ class PostScreen extends StatelessWidget {
                     likes: List<String>.from(post["likes"] ?? []),
                     disLikes: List<String>.from(post["disLikes"] ?? []),
                     user: post["UserID"],
-                    commentsCount: List<String>.from(post["comments"] ?? []),
+                    commentsCount: post["comments"],
                   );
                 }),
               );

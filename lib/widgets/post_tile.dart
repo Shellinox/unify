@@ -27,7 +27,7 @@ class PostTile extends StatefulWidget {
   final List<String> likes;
   final List<String> disLikes;
   final String user;
-  final List<String> commentsCount;
+  final int commentsCount;
 
   @override
   State<PostTile> createState() => _PostTileState();
@@ -178,7 +178,7 @@ class _PostTileState extends State<PostTile> {
                   ),
                   SocialButton(
                     icondata: const Icon(Icons.comment_outlined),
-                    count: widget.commentsCount.length,
+                    count: widget.commentsCount,
                     onTap: () {
                       showModalBottomSheet(
                         enableDrag: true,
