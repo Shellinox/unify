@@ -10,7 +10,6 @@ class CommentTile extends StatelessWidget {
   final String comment;
   final String date;
   final String commentBy;
-
   @override
   Widget build(BuildContext context) {
     return ListTile(

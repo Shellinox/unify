@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:unify/auth/auth.dart';
@@ -11,7 +12,6 @@ class AddPostScreen extends StatelessWidget {
 
   final postController = TextEditingController();
   final titleController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,7 +126,8 @@ class AddPostScreen extends StatelessWidget {
                     "content": postController.text.toString().trim(),
                     "disLikes": [],
                     "likes": [],
-                    "comments": [],
+                    "UserID": FirebaseAuth.instance.currentUser!.email,
+                    "comments":[]
                   };
                   Provider.of<PostProvider>(context, listen: false)
                       .addPost(post);

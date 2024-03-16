@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class PostProvider extends ChangeNotifier {
   final posts = FirebaseFirestore.instance.collection("Posts");
+  int count = 0;
 
   void addPost(Map<String, dynamic> post) async {
     await posts.add(post);
@@ -14,9 +15,12 @@ class PostProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
-  // void addComment(Map<String, dynamic> comment, String postID) {
-  //   posts.doc(postID).set();
-  //   notifyListeners();
-  // }
+  int getCount(String postID) {
+    FirebaseFirestore.instance
+        .collection("Posts")
+        .doc(postID)
+        .collection("Comments").snapshots().length;
+    notifyListeners();
+    return count;
+  }
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:unify/provider/post_provider.dart';
 import 'package:unify/provider/theme_provider.dart';
 import 'package:unify/widgets/alert_Dialog.dart';
 import 'package:unify/widgets/comment_bottom_sheet_widget.dart';
@@ -17,7 +18,7 @@ class PostTile extends StatefulWidget {
       required this.postID,
       required this.likes,
       required this.disLikes,
-      required this.user});
+      required this.user, required this.commentsCount});
   final String imgPath;
   final String heading;
   final String content;
@@ -26,6 +27,7 @@ class PostTile extends StatefulWidget {
   final List<String> likes;
   final List<String> disLikes;
   final String user;
+  final List<String> commentsCount;
 
   @override
   State<PostTile> createState() => _PostTileState();
@@ -35,6 +37,7 @@ class _PostTileState extends State<PostTile> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   bool isLiked = false;
   bool isDisliked = false;
+
   @override
   void initState() {
     isLiked = widget.likes.contains(currentUser.email);
@@ -54,7 +57,7 @@ class _PostTileState extends State<PostTile> {
       });
     } else {
       postref.update({
-        "disLikes": FieldValue.arrayRemove([currentUser.email])
+        "likes": FieldValue.arrayRemove([currentUser.email])
       });
     }
   }
@@ -119,22 +122,25 @@ class _PostTileState extends State<PostTile> {
                     ],
                   ),
                   const Spacer(),
-                  IconButton(
-                      onPressed: () {
-                        showAlert(
-                            context,
-                            "Are you sure you want to delete the post",
-                            "Delete post?",
-                            "Delete", () {
-                          FirebaseFirestore.instance
-                              .collection("Posts")
-                              .doc(widget.postID)
-                              .delete();
-                          showSnackbar(context, "Post deleted");
-                          Navigator.of(context).pop();
-                        });
-                      },
-                      icon: const Icon(Icons.delete))
+                  currentUser.email == widget.user
+                      ? IconButton(
+                          onPressed: () {
+                            showAlert(
+                                context,
+                                "Are you sure you want to delete the post",
+                                "Delete post?",
+                                "Delete", () {
+                              FirebaseFirestore.instance
+                                  .collection("Posts")
+                                  .doc(widget.postID)
+                                  .delete();
+                              showSnackbar(context, "Post deleted");
+                              Navigator.of(context).pop();
+                            });
+                          },
+                          icon: const Icon(Icons.delete),
+                        )
+                      : Container(),
                 ],
               ),
               const SizedBox(
@@ -172,7 +178,7 @@ class _PostTileState extends State<PostTile> {
                   ),
                   SocialButton(
                     icondata: const Icon(Icons.comment_outlined),
-                    count: 0,
+                    count: widget.commentsCount.length,
                     onTap: () {
                       showModalBottomSheet(
                         enableDrag: true,

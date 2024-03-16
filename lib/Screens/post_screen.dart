@@ -13,6 +13,7 @@ class PostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Posts"),
@@ -54,6 +55,7 @@ class PostScreen extends StatelessWidget {
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: ((context, postIndex) {
                   final post = snapshot.data!.docs[postIndex];
+
                   return PostTile(
                     imgPath: post['profilePic'],
                     heading: post['heading'],
@@ -62,7 +64,8 @@ class PostScreen extends StatelessWidget {
                     postID: post.id,
                     likes: List<String>.from(post["likes"] ?? []),
                     disLikes: List<String>.from(post["disLikes"] ?? []),
-                    user: FirebaseAuth.instance.currentUser!.email.toString(),
+                    user: post["UserID"],
+                    commentsCount: List<String>.from(post["comments"] ?? []),
                   );
                 }),
               );

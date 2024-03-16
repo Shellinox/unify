@@ -16,7 +16,10 @@ class CommentSheet extends StatelessWidget {
         .add({
       "Comment": comment,
       "Comment by": currentUser.email,
-      "time": Timestamp.now()
+      "time": Timestamp.now(),
+    });
+    FirebaseFirestore.instance.collection("Posts").doc(postID).update({
+      "comments": FieldValue.arrayUnion([comment])
     });
   }
 
@@ -44,7 +47,6 @@ class CommentSheet extends StatelessWidget {
                       .orderBy("time", descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
-          
                     if (!snapshot.hasData) {
                       return const Center(
                         child: CircularProgressIndicator(),
